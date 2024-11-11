@@ -141,6 +141,7 @@ contract Token {
     fn private_get_symbol() -> pub FieldCompressedString {
         storage.symbol.read_private()
     }
+
     #[public]
     #[view]
     fn public_get_decimals() -> pub u8 {
@@ -222,21 +223,21 @@ contract Token {
     }
     // docs:end:mint_private
     // docs:start:shield
-    #[public]
-    fn shield(from: AztecAddress, amount: Field, secret_hash: Field, nonce: Field) {
-        if (!from.eq(context.msg_sender())) {
-            // The redeem is only spendable once, so we need to ensure that you cannot insert multiple shields from the same message.
-            assert_current_call_valid_authwit_public(&mut context, from);
-        } else {
-            assert(nonce == 0, "invalid nonce");
-        }
-        let amount = U128::from_integer(amount);
-        let from_balance = storage.public_balances.at(from).read().sub(amount);
-        let pending_shields = storage.pending_shields;
-        let mut note = TransparentNote::new(amount.to_field(), secret_hash);
-        storage.public_balances.at(from).write(from_balance);
-        pending_shields.insert_from_public(&mut note);
-    }
+    // #[public]
+    // fn shield(from: AztecAddress, amount: Field, secret_hash: Field, nonce: Field) {
+    //     if (!from.eq(context.msg_sender())) {
+    //         // The redeem is only spendable once, so we need to ensure that you cannot insert multiple shields from the same message.
+    //         assert_current_call_valid_authwit_public(&mut context, from);
+    //     } else {
+    //         assert(nonce == 0, "invalid nonce");
+    //     }
+    //     let amount = U128::from_integer(amount);
+    //     let from_balance = storage.public_balances.at(from).read().sub(amount);
+    //     let pending_shields = storage.pending_shields;
+    //     let mut note = TransparentNote::new(amount.to_field(), secret_hash);
+    //     storage.public_balances.at(from).write(from_balance);
+    //     pending_shields.insert_from_public(&mut note);
+    // }
     // docs:end:shield
     // docs:start:transfer_public
     #[public]
@@ -465,7 +466,7 @@ contract Token {
         storage.balances.at(from).sub(from, U128::from_integer(amount)).emit(
             encode_and_encrypt_note_unconstrained(&mut context, from_ovpk_m, from, from),
         );
-        Token::at(context.this_address())._reduce_total_supply(amount).enqueue(&mut context);
+        // Token::at(context.this_address())._reduce_total_supply(amount).enqueue(&mut context);
     }
     // docs:end:burn
 
@@ -781,36 +782,36 @@ contract Token {
         context.storage_write(slot + aztec::protocol_types::point::POINT_LENGTH as Field, setup_log);
     }
 
-    // TODO(#7728): even though the funded_amount should be a U128, we can't have that type in a contract interface due
-    // to serialization issues.
-    // docs:start:complete_refund
-    #[public]
-    #[internal]
-    fn complete_refund(fee_payer_slot: Field, user_slot: Field, funded_amount: Field) {
-        // TODO(#7728): Remove the next line
-        let funded_amount = U128::from_integer(funded_amount);
-        let tx_fee = U128::from_integer(context.transaction_fee());
+    // // TODO(#7728): even though the funded_amount should be a U128, we can't have that type in a contract interface due
+    // // to serialization issues.
+    // // docs:start:complete_refund
+    // #[public]
+    // #[internal]
+    // fn complete_refund(fee_payer_slot: Field, user_slot: Field, funded_amount: Field) {
+    //     // TODO(#7728): Remove the next line
+    //     let funded_amount = U128::from_integer(funded_amount);
+    //     let tx_fee = U128::from_integer(context.transaction_fee());
 
-        // 1. We check that user funded the fee payer contract with at least the transaction fee.
-        // TODO(#7796): we should try to prevent reverts here
-        assert(funded_amount >= tx_fee, "funded amount not enough to cover tx fee");
+    //     // 1. We check that user funded the fee payer contract with at least the transaction fee.
+    //     // TODO(#7796): we should try to prevent reverts here
+    //     assert(funded_amount >= tx_fee, "funded amount not enough to cover tx fee");
 
-        // 2. We compute the refund amount as the difference between funded amount and tx fee.
-        let refund_amount = funded_amount - tx_fee;
+    //     // 2. We compute the refund amount as the difference between funded amount and tx fee.
+    //     let refund_amount = funded_amount - tx_fee;
 
-        // 3. We construct the note finalization payloads with the correct amounts and hiding points to get the note
-        // hashes and unencrypted logs.
-        let fee_payer_finalization_payload =
-            UintNote::finalization_payload().new(&mut context, fee_payer_slot, tx_fee);
-        let user_finalization_payload =
-            UintNote::finalization_payload().new(&mut context, user_slot, refund_amount);
+    //     // 3. We construct the note finalization payloads with the correct amounts and hiding points to get the note
+    //     // hashes and unencrypted logs.
+    //     let fee_payer_finalization_payload =
+    //         UintNote::finalization_payload().new(&mut context, fee_payer_slot, tx_fee);
+    //     let user_finalization_payload =
+    //         UintNote::finalization_payload().new(&mut context, user_slot, refund_amount);
 
-        // 4. At last we emit the note hashes and the final note logs.
-        fee_payer_finalization_payload.emit();
-        user_finalization_payload.emit();
-        // --> Once the tx is settled user and fee recipient can add the notes to their pixies.
-    }
-    // docs:end:complete_refund
+    //     // 4. At last we emit the note hashes and the final note logs.
+    //     fee_payer_finalization_payload.emit();
+    //     user_finalization_payload.emit();
+    //     // --> Once the tx is settled user and fee recipient can add the notes to their pixies.
+    // }
+    // // docs:end:complete_refund
 
     /// Internal ///
     // docs:start:increase_public_balance
@@ -820,22 +821,22 @@ contract Token {
         let new_balance = storage.public_balances.at(to).read().add(U128::from_integer(amount));
         storage.public_balances.at(to).write(new_balance);
     }
-    // docs:end:increase_public_balance
-    // docs:start:reduce_total_supply
-    #[public]
-    #[internal]
-    fn _reduce_total_supply(amount: Field) {
-        // Only to be called from burn.
-        let new_supply = storage.total_supply.read().sub(U128::from_integer(amount));
-        storage.total_supply.write(new_supply);
-    }
-    // docs:end:reduce_total_supply
-    /// Unconstrained ///
-    // docs:start:balance_of_private
-    pub(crate) unconstrained fn balance_of_private(owner: AztecAddress) -> pub Field {
-        storage.balances.at(owner).balance_of().to_field()
-    }
-    // docs:end:balance_of_private
+    // // docs:end:increase_public_balance
+    // // docs:start:reduce_total_supply
+    // #[public]
+    // #[internal]
+    // fn _reduce_total_supply(amount: Field) {
+    //     // Only to be called from burn.
+    //     let new_supply = storage.total_supply.read().sub(U128::from_integer(amount));
+    //     storage.total_supply.write(new_supply);
+    // }
+    // // docs:end:reduce_total_supply
+    // /// Unconstrained ///
+    // // docs:start:balance_of_private
+    // pub(crate) unconstrained fn balance_of_private(owner: AztecAddress) -> pub Field {
+    //     storage.balances.at(owner).balance_of().to_field()
+    // }
+    // // docs:end:balance_of_private
 }
 
 // docs:end:token_all

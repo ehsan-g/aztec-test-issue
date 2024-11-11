@@ -162,9 +162,6 @@ UintNote: {
   /** Type-safe wrappers for the public methods exposed by the contract. */
   public declare methods: {
     
-    /** balance_of_private(owner: struct) */
-    balance_of_private: ((owner: AztecAddressLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
     /** balance_of_public(owner: struct) */
     balance_of_public: ((owner: AztecAddressLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
@@ -239,9 +236,6 @@ UintNote: {
 
     /** setup_refund(fee_payer: struct, user: struct, funded_amount: field) */
     setup_refund: ((fee_payer: AztecAddressLike, user: AztecAddressLike, funded_amount: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
-
-    /** shield(from: struct, amount: field, secret_hash: field, nonce: field) */
-    shield: ((from: AztecAddressLike, amount: FieldLike, secret_hash: FieldLike, nonce: FieldLike) => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;
 
     /** total_supply() */
     total_supply: (() => ContractFunctionInteraction) & Pick<ContractMethod, 'selector'>;

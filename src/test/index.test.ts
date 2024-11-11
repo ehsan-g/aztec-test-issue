@@ -33,7 +33,7 @@ describe("Voting", () => {
 
         const deploymentData = getContractInstanceFromDeployParams(ContractArtifact,
             {
-                constructorArgs: [adminWallet,
+                constructorArgs: [adminAddress,
                     "TokenA",
                     "AAA",
                     18,],

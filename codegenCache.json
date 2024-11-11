@@ -1,3 +1,10 @@
 {
-  "easy_private_voting_contract-EasyPrivateVoting.json": "4662c1c3f60516d75a615dd7f04c52b2c8536e641e8ad3d3f25a052a48d7ed40"
+  "easy_private_voting_contract-EasyPrivateVoting.json": {
+    "contractName": "EasyPrivateVoting",
+    "hash": "5ca6dad29d5e6ee429c2e3b2381b5275f064f19fdd3f739cd473c368fa2e98c6"
+  },
+  "token_contract-Token.json": {
+    "contractName": "Token",
+    "hash": "e26c5ec5f89f5a7115ad21c2e0b9c37b08d0234c3809e4aca7be70b322fea61d"
+  }
 }

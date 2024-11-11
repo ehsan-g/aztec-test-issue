@@ -29,9 +29,7 @@ describe("Voting", () => {
         const salt = Fr.random();
         const ContractArtifact = TokenContractArtifact
         const [deployerWallet, adminWallet] = wallets; // using first account as deployer and second as contract admin
-        const adminAddress = await adminWallet.getCompleteAddress();
-        console.log(adminAddress.address);
-        
+        const adminAddress = await adminWallet.getCompleteAddress().address;
 
         const deploymentData = getContractInstanceFromDeployParams(ContractArtifact,
             {

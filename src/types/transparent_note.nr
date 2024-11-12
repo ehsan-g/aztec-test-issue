@@ -1,4 +1,3 @@
-// docs:start:token_types_all
 use dep::aztec::{
     macros::notes::note,
     note::utils::compute_note_hash_for_nullify,
@@ -60,4 +59,3 @@ impl Eq for TransparentNote {
     }
 }
 
-// docs:end:token_types_all

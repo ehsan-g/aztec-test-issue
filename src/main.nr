@@ -31,7 +31,7 @@ contract Token {
         },
         oracle::random::random,
         prelude::{
-            AztecAddress, FunctionSelector, Map, PublicContext, PublicMutable, SharedImmutable,
+            AztecAddress, FunctionSelector, Map, PublicContext, PublicImmutable, PublicMutable,
         },
         protocol_types::{point::Point, traits::Serialize},
     };
@@ -70,9 +70,9 @@ contract Token {
         balances: Map<AztecAddress, BalanceSet<Context>, Context>,
         total_supply: PublicMutable<U128, Context>,
         public_balances: Map<AztecAddress, PublicMutable<U128, Context>, Context>,
-        symbol: SharedImmutable<FieldCompressedString, Context>,
-        name: SharedImmutable<FieldCompressedString, Context>,
-        decimals: SharedImmutable<u8, Context>,
+        symbol: PublicImmutable<FieldCompressedString, Context>,
+        name: PublicImmutable<FieldCompressedString, Context>,
+        decimals: PublicImmutable<u8, Context>,
     }
 
     #[public]
@@ -95,36 +95,37 @@ contract Token {
     #[public]
     #[view]
     fn public_get_name() -> FieldCompressedString {
-        storage.name.read_public()
+        storage.name.read()
     }
 
     #[private]
     #[view]
     fn private_get_name() -> FieldCompressedString {
-        storage.name.read_private()
+        storage.name.read()
     }
 
     #[public]
     #[view]
     fn public_get_symbol() -> pub FieldCompressedString {
-        storage.symbol.read_public()
+        storage.symbol.read()
     }
 
     #[private]
     #[view]
     fn private_get_symbol() -> pub FieldCompressedString {
-        storage.symbol.read_private()
+        storage.symbol.read()
     }
 
     #[public]
     #[view]
     fn public_get_decimals() -> pub u8 {
-        storage.decimals.read_public()
+        storage.decimals.read()
     }
+
     #[private]
     #[view]
     fn private_get_decimals() -> pub u8 {
-        storage.decimals.read_private()
+        storage.decimals.read()
     }
 
     #[public]

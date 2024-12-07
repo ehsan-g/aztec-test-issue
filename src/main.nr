@@ -205,7 +205,7 @@ contract Token {
         }
 
         let from_ovpk_m = get_public_keys(from).ovpk_m;
-        // TODO: constrain encryption below - we are using unconstrained here only becuase of the following Noir issue
+        // TODO: constrain encryption below - we are using unconstrained here only because of the following Noir issue
         // https://github.com/noir-lang/noir/issues/5771
         storage.balances.at(from).sub(from, U128::from_integer(amount)).emit(
             encode_and_encrypt_note_unconstrained(&mut context, from_ovpk_m, from, from),
@@ -381,8 +381,9 @@ contract Token {
     /// some of the finalization functions (`finalize_transfer_to_private`, `finalize_mint_to_private`).
     /// Returns a hiding point slot.
     #[private]
-    fn prepare_private_balance_increase(to: AztecAddress) -> Field {
-        let from = context.msg_sender();
+    fn prepare_private_balance_increase(to: AztecAddress, from: AztecAddress) -> Field {
+        // TODO(#9887): ideally we'd not have `from` here, but we do need a `from` address to produce a tagging secret
+        // with `to`.
         _prepare_private_balance_increase(from, to, &mut context, storage)
     }
 
@@ -623,7 +624,7 @@ contract Token {
     fn _store_payload_in_transient_storage_unsafe(
         slot: Field,
         point: Point,
-        setup_log: [Field; 15],
+        setup_log: [Field; 14],
     ) {
         context.storage_write(slot, point);
         context.storage_write(slot + aztec::protocol_types::point::POINT_LENGTH as Field, setup_log);
